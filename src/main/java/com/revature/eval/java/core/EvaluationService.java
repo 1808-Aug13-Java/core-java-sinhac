@@ -89,22 +89,30 @@ public class EvaluationService {
 		public void setSideThree(double sideThree) {
 			this.sideThree = sideThree;
 		}
+		
+		// helper function that counts the number of equal sides
+		private int numEqualSides() {
+			int numEqualSides = 0;
+			if (((Double) sideOne).equals(sideTwo)) {
+				numEqualSides++;
+			}
+			if (((Double) sideTwo).equals(sideThree)) {
+				numEqualSides++;
+			}
+			return numEqualSides;
+		}
 
 		public boolean isEquilateral() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			return numEqualSides()==2;
 		}
 
 		public boolean isIsosceles() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			return numEqualSides() >= 1;
 		}
 
 		public boolean isScalene() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			return numEqualSides()==0;
 		}
-
 	}
 
 	/**
