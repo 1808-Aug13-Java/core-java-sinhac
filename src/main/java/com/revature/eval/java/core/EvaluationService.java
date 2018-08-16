@@ -90,7 +90,7 @@ public class EvaluationService {
 			this.sideThree = sideThree;
 		}
 		
-		// helper function that counts the number of equal sides
+		// helper function that counts the number of equalities between sides
 		private int numEqualSides() {
 			int numEqualSides = 0;
 			if (((Double) sideOne).equals(sideTwo)) {
@@ -99,11 +99,14 @@ public class EvaluationService {
 			if (((Double) sideTwo).equals(sideThree)) {
 				numEqualSides++;
 			}
+			if (((Double) sideThree).equals(sideOne)) {
+				numEqualSides++;
+			}
 			return numEqualSides;
 		}
 
 		public boolean isEquilateral() {
-			return numEqualSides()==2;
+			return numEqualSides()==3;
 		}
 
 		public boolean isIsosceles() {
