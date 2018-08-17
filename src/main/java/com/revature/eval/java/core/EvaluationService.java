@@ -580,8 +580,32 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String encode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			String letters = "abcdefghijklmnopqrstuvwxyz";
+			EvaluationService es = new EvaluationService();
+			String cipher = es.reverse(letters);
+			
+			HashMap<Character, Character> code = new HashMap<>();
+			for (int i = 0; i < letters.length(); i++) {
+				code.put(letters.charAt(i), cipher.charAt(i));
+			}
+			
+			String encoding = "";
+			int spacing = 0;
+			for (int i = 0; i < string.length(); i++) {
+				char c = string.charAt(i);
+				if (Character.isLetter(c)) {
+					c = code.get(Character.toLowerCase(c));
+					encoding+=c;
+					spacing++;
+				} else if (Character.isDigit(c)) {
+					encoding+=c;
+					spacing++;
+				}
+				if (spacing%5==0) {
+					encoding+=" ";
+				}
+			}
+			return encoding;
 		}
 
 		/**
@@ -591,8 +615,26 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String decode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			String letters = "abcdefghijklmnopqrstuvwxyz";
+			EvaluationService es = new EvaluationService();
+			String cipher = es.reverse(letters);
+			
+			HashMap<Character, Character> code = new HashMap<>();
+			for (int i = 0; i < letters.length(); i++) {
+				code.put(cipher.charAt(i), letters.charAt(i));
+			}
+			
+			String decoding = "";
+			for (int i = 0; i < string.length(); i++) {
+				char c = string.charAt(i);
+				if (Character.isLetter(c)) {
+					c = code.get(Character.toLowerCase(c));
+					decoding+=c;
+				} else if (Character.isDigit(c)) {
+					decoding+=c;
+				}
+			}
+			return decoding;
 		}
 	}
 
