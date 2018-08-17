@@ -1,6 +1,7 @@
 package com.revature.eval.java.core;
 
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -208,9 +209,24 @@ public class EvaluationService {
 	 * Note: As this exercise only deals with telephone numbers used in
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
-	public String cleanPhoneNumber(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+	public String cleanPhoneNumber(String string) throws IllegalArgumentException {
+		String legalCharacters = "+ ()-.";
+		String phoneNumber = "";
+		for (int i = 0; i < string.length(); i++) {
+			if (Character.isDigit(string.charAt(i))) {
+				phoneNumber = phoneNumber.concat(string.substring(i, i+1));
+			} else if (!legalCharacters.contains(string.substring(i, i+1))) {
+				throw new IllegalArgumentException("invalid input");
+			}
+		}
+		
+		int length = phoneNumber.length();
+		if (length == 11 && phoneNumber.charAt(0)=='1') {
+			return phoneNumber;
+		} else if (length != 10) {
+			throw new IllegalArgumentException("must contain 10 digits (or 11 digits starting with 1)");
+		}
+		return phoneNumber;
 	}
 
 	/**
@@ -223,8 +239,17 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		
+		String[] words = string.split("\\s+");
+		HashMap<String, Integer> wordCount = new HashMap<>();
+		/*for (int i = 0; i < words.length; i++) {
+			if (!wordCount.containsKey(words[i])) {
+				wordCount.put(words[i], 1);
+			} else {
+				wordCount.put(words[i], wordCount.get(words[i])+1);
+			}
+		}*/
+		return wordCount;
 	}
 
 	/**
