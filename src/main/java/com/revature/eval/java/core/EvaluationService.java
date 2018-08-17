@@ -240,15 +240,15 @@ public class EvaluationService {
 	 */
 	public Map<String, Integer> wordCount(String string) {
 		
-		String[] words = string.split("\\s+");
-		HashMap<String, Integer> wordCount = new HashMap<>();
-		/*for (int i = 0; i < words.length; i++) {
+		String[] words = string.split("\\W+");
+		Map<String, Integer> wordCount = new HashMap<>();
+		for (int i = 0; i < words.length; i++) {
 			if (!wordCount.containsKey(words[i])) {
 				wordCount.put(words[i], 1);
 			} else {
 				wordCount.put(words[i], wordCount.get(words[i])+1);
 			}
-		}*/
+		}
 		return wordCount;
 	}
 
