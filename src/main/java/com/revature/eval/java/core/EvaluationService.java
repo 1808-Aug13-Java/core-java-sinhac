@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class EvaluationService {
 
@@ -414,8 +415,31 @@ public class EvaluationService {
 	 * @return
 	 */
 	public List<Long> calculatePrimeFactorsOf(long l) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		List<Long> primeFactors = new ArrayList<>();
+		long maxPossiblePrime = (long) Math.sqrt(l);
+		
+		while (true) {
+			long y = 2;
+			while(y <= maxPossiblePrime) {
+				if (l%y==0) {
+					boolean isPrime = true;
+					long x = 2;
+					while (x < y) {
+						if (y%x==0) {
+							isPrime = false;
+						}
+						x++;
+					}
+					
+					if (isPrime) {
+						primeFactors.add(y);
+					}
+				}
+				y++;
+			}
+			break;
+		}
+		return primeFactors;
 	}
 
 	/**
@@ -453,15 +477,37 @@ public class EvaluationService {
 		}
 
 		public String rotate(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			if (key > 26) {
+				key = key % 26;
+			}
+			
+			String letters = "abcdefghijklmnopqrstuvwxyz";
+			String cipher = letters.substring(key) + letters.substring(0,key);
+			HashMap<Character, Character> code = new HashMap<>();
+			for (int i = 0; i < letters.length(); i++) {
+				code.put(letters.charAt(i), cipher.charAt(i));
+			}
+			
+			String result = "";
+			for (int i = 0; i < string.length(); i++) {
+				char c = string.charAt(i);
+				if (Character.isLetter(c)) {
+					if (Character.isUpperCase(c)) {
+						c = Character.toUpperCase(code.get(Character.toLowerCase(c)));
+					} else {
+						c = code.get(c);
+					}
+				}
+				result+=c;
+			}
+			return result;
 		}
 
 	}
 
 	/**
 	 * 12. Given a number n, determine what the nth prime is.
-	 * 
+	 * s
 	 * By listing the first six prime numbers: 2, 3, 5, 7, 11, and 13, we can see
 	 * that the 6th prime is 13.
 	 * 
