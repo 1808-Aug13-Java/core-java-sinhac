@@ -661,8 +661,29 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		int numDigits = 0;
+		int multiplier = 10;
+		int sum = 0;
+		for (int i = 0; i < string.length(); i++) {
+			if (Character.isDigit(string.charAt(i))) {
+				numDigits++;
+				sum = Integer.parseInt(string.charAt(i)+"")*multiplier;
+				multiplier--;
+			}
+		}
+		char lastChar = string.charAt(string.length()-1);
+		if (Character.isAlphabetic(lastChar)) {
+			if (lastChar!='X') {
+				return false;
+			} else if (numDigits != 9) {
+				return false;
+			} else {
+				sum+=10;
+			}
+		} else if (numDigits != 10) {
+			return false;
+		}
+		return sum%11==0;
 	}
 
 	/**
@@ -679,8 +700,19 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isPangram(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		HashSet<Character> alphabet = new HashSet<>();
+		String abcs = "abcdefghijklmnopqrstuvwxyz";
+		for (int i = 0; i < abcs.length(); i++) {
+			alphabet.add(abcs.charAt(i));
+		}
+		
+		for (int i = 0; i < string.length(); i++) {
+			if (alphabet.contains(string.charAt(i))) {
+				alphabet.remove(string.charAt(i));
+			}
+		}
+		
+		return alphabet.size()==0;
 	}
 
 	/**
