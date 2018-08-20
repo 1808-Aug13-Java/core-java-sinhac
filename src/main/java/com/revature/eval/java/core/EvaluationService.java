@@ -1,12 +1,14 @@
 package com.revature.eval.java.core;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 
 public class EvaluationService {
 
@@ -23,7 +25,6 @@ public class EvaluationService {
 		for (int i = letters.length-1; i > -1; i--) {
 			reversedString+=letters[i];
 		}
-		
 		return reversedString;
 	}
 
@@ -36,7 +37,7 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
-		String[] words = phrase.split("\\s+");
+		String[] words = phrase.split("\\W+");
 		String acronym = "";
 		for (int i = 0; i < words.length; i++) {
 			acronym+=(words[i].substring(0,1)).toUpperCase();
@@ -288,24 +289,33 @@ public class EvaluationService {
 	 * binary search is a dichotomic divide and conquer search algorithm.
 	 * 
 	 */
-	static class BinarySearch<T extends Comparable<T>> {
+	static class BinarySearch<T> {
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
+			if (sortedList.isEmpty()) {
+				return -1;
+			}
+
 			int leftPosition = 0;
 			int rightPosition = sortedList.size()-1;
 			while (sortedList.size() > 0) {
+				int value = Integer.parseInt(t.toString());
+				int last = Integer.parseInt(sortedList.get(rightPosition).toString());
+				if (value == last) {
+					return rightPosition;
+				}
+				
 				int mid = (leftPosition + rightPosition)/2;
-				int comparison = t.compareTo(sortedList.get(mid));
-				if (comparison == 0) {
+				int guess = Integer.parseInt(sortedList.get(mid).toString());
+				if (value == guess) {
 					return mid;
-				} else if (comparison < 0) {
+				} else if (value < guess) {
 					rightPosition = mid;
-				} else {
+				} else if (value > guess) {
 					leftPosition = mid;
 				}
 			}
-			// return error
 			return 0;
 		}
 
@@ -352,12 +362,16 @@ public class EvaluationService {
 			String word = words[i];
 			String suffix = "";
 			int j = 0;
-			while (j < word.length() && !word.matches("[aeiou].+")) {
-				suffix+=word.charAt(0);
-				word = word.substring(1, word.length());
-				j++;
+			if (word.startsWith("qu")) {
+				words[i] = word.substring(2) + "qu" + "ay";
+			} else {
+				while (j < word.length() && !word.matches("[aeiou].+")) {
+					suffix+=word.charAt(0);
+					word = word.substring(1, word.length());
+					j++;
+				}
+				words[i] = word + suffix + "ay";
 			}
-			words[i] = word + suffix + "ay";
 		}
 		
 		String pigLatin = words[0];
@@ -416,28 +430,19 @@ public class EvaluationService {
 	 */
 	public List<Long> calculatePrimeFactorsOf(long l) {
 		List<Long> primeFactors = new ArrayList<>();
-		long maxPossiblePrime = (long) Math.sqrt(l);
-		
-		while (true) {
-			long y = 2;
-			while(y <= maxPossiblePrime) {
-				if (l%y==0) {
-					boolean isPrime = true;
-					long x = 2;
-					while (x < y) {
-						if (y%x==0) {
-							isPrime = false;
-						}
-						x++;
-					}
-					
-					if (isPrime) {
-						primeFactors.add(y);
-					}
-				}
-				y++;
+		if (l < 2L) {
+			return primeFactors;
+		} 
+		long factor = l;
+		long inc = 2L;
+		while (inc <= factor) {
+			if (factor%inc == 0) {
+				primeFactors.add(inc);
+				factor = factor / inc;
+				inc = 2L;
+			} else {
+				inc++;
 			}
-			break;
 		}
 		return primeFactors;
 	}
@@ -581,6 +586,7 @@ public class EvaluationService {
 		 */
 		public static String encode(String string) {
 			String letters = "abcdefghijklmnopqrstuvwxyz";
+			
 			EvaluationService es = new EvaluationService();
 			String cipher = es.reverse(letters);
 			
@@ -593,19 +599,17 @@ public class EvaluationService {
 			int spacing = 0;
 			for (int i = 0; i < string.length(); i++) {
 				char c = string.charAt(i);
-				if (Character.isLetter(c)) {
-					c = code.get(Character.toLowerCase(c));
+				if (Character.isLetter(c) || Character.isDigit(c)) {
+					if (Character.isAlphabetic(c)) {
+						c = code.get(Character.toLowerCase(c));
+					}
 					encoding+=c;
 					spacing++;
-				} else if (Character.isDigit(c)) {
-					encoding+=c;
-					spacing++;
-				}
-				if (spacing%5==0) {
-					encoding+=" ";
+					if (spacing%5==0)
+						encoding+=" ";		
 				}
 			}
-			return encoding;
+			return encoding.trim();
 		}
 
 		/**
@@ -661,26 +665,29 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
-		int numDigits = 0;
+		string = string.trim();
+		if (string.length() < 10) {
+			return false;
+		}
+		int numDigits = 0, sum = 0;
 		int multiplier = 10;
-		int sum = 0;
 		for (int i = 0; i < string.length(); i++) {
-			if (Character.isDigit(string.charAt(i))) {
+			char c = string.charAt(i);
+			if (Character.isDigit(c)) {
 				numDigits++;
-				sum = Integer.parseInt(string.charAt(i)+"")*multiplier;
+				sum+=(Integer.parseInt(c+"")*multiplier);
 				multiplier--;
+			} else if (i==string.length()-1) {
+				if (c=='X') {
+					numDigits++;
+					sum+=(10*multiplier);
+				} else {
+					return false;
+				}
 			}
 		}
-		char lastChar = string.charAt(string.length()-1);
-		if (Character.isAlphabetic(lastChar)) {
-			if (lastChar!='X') {
-				return false;
-			} else if (numDigits != 9) {
-				return false;
-			} else {
-				sum+=10;
-			}
-		} else if (numDigits != 10) {
+		
+		if (numDigits != 10) {
 			return false;
 		}
 		return sum%11==0;
@@ -718,14 +725,45 @@ public class EvaluationService {
 	/**
 	 * 17. Calculate the moment when someone has lived for 10^9 seconds.
 	 * 
-	 * A gigasecond is 109 (1,000,000,000) seconds.
+	 * A gigasecond is 10^9 (1,000,000,000) seconds.
 	 * 
 	 * @param given
 	 * @return
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		String givenType = given.getClass().getSimpleName(); 
+		int gigasecond = 1000000000;
+		switch (givenType) {
+		case "HijrahDate":
+			break;
+		case "Instant":
+			break;
+		case "JapaneseDate":
+			break;
+		case "LocalDate":
+			LocalDateTime ldt = ((LocalDate) given).atTime(0,0,0);
+			return ldt.plusSeconds(gigasecond);
+		case "LocalDateTime":
+			return ((LocalDateTime) given).plusSeconds(gigasecond);
+		case "LocalTime":
+			break;
+		case "MinguoDate":
+			break;
+		case "OffsetDateTime":
+			break;
+		case "OffsetTime":
+			break;
+		case "ThaiBuddhistDate":
+			break;
+		case "Year":
+			break;
+		case "YearMonth":
+			break;
+		case "ZonedDateTime":
+			break;
+		}
+		
+		return given;
 	}
 
 	/**
@@ -742,8 +780,20 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		HashSet<Integer> multiples = new HashSet<>();
+		for (int j = 0; j < set.length; j++) {
+			for (int k = 0; k < i; k++) {
+				if (k%set[j]==0) {
+					multiples.add(k);
+				}
+			}
+		}
+		int sum = 0;
+		Iterator<Integer> iterator = multiples.iterator();
+		while (iterator.hasNext()) {
+			sum+=((int) iterator.next());
+	    }
+		return sum;
 	}
 
 	/**
@@ -783,8 +833,29 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isLuhnValid(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		string = string.replaceAll("\\s+", "");
+		
+		if (string.length() <= 1) {
+			return false;
+		}
+		
+		if (string.length() > string.replaceAll("\\D+", "").length()) {
+			return false;
+		}
+
+		int i = 0;
+		int sum = 0;
+		int len = string.length();
+		while (i < len) {
+			int digit = string.charAt(len-i-1)-'0';
+			if (i % 2 == 1) {
+				digit = (digit*2) % 9;
+			} 
+			sum+=digit;
+			i++;
+		}
+		
+		return sum % 10 == 0;
 	}
 
 	/**
@@ -815,8 +886,35 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		// assuming single operations of integers only given in format provided
+		int result = 0;
+		
+		String[] words = string.split("\\s+");
+		int firstNum = Integer.parseInt(words[2]);
+		int secondNum = 0;
+		words[words.length - 1] = words[words.length - 1].replace("?", "");
+		String operation = words[3];
+		switch (operation) {
+		case "plus":
+			secondNum = Integer.parseInt(words[4]);
+			return firstNum + secondNum;
+		case "minus":
+			secondNum = Integer.parseInt(words[4]);
+			return firstNum - secondNum;
+		case "multiplied":
+			words[4] = "by";
+			secondNum = Integer.parseInt(words[5]);
+			return firstNum*secondNum;
+		case "divided":
+			words[4] = "by";
+			secondNum = Integer.parseInt(words[5]);
+			if (secondNum==0) {
+				// throw exception
+			}
+			return firstNum / secondNum;	
+		default:
+			// throw exception
+		}
+		return result;
 	}
-
 }
